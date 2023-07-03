@@ -3,6 +3,7 @@ package etu1922.framework.servlet;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.net.URL;
 import jakarta.servlet.ServletException;
@@ -63,6 +64,10 @@ public class FrontServlet extends HttpServlet {
                     Object returnObject = equalMethod.invoke(object);
                     if (returnObject instanceof ModelView) {
                         ModelView modelview = (ModelView) returnObject;
+                        HashMap<String,Object> data = modelview.getData();
+                        for(Map.Entry<String,Object> o : data.entrySet()){
+                            request.setAttribute(o.getKey(),o.getValue());
+                        }  
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
                         requestDispatcher.forward(request, response);
                     }
