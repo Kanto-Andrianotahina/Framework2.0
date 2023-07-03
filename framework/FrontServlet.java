@@ -9,18 +9,21 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 import etu1922.framework.Annotation;
 import etu1922.framework.Mapping;
 import etu1922.framework.Outil;
+import etu1922.framework.ModelView;
+
 
 public class FrontServlet extends HttpServlet {
-    HashMap<String,Mapping> mappingUrls;
+    HashMap<String,Mapping> mappingUrls = new HashMap<String,Mapping>();
 
     public void init() {
-        String packageName = "Test";
+        String packageName = "test_framework.Test";
         try {
             List<Class> allClass = Outil.getClass(packageName);
             for (int i = 0; i < allClass.size(); i++) {
@@ -29,7 +32,7 @@ public class FrontServlet extends HttpServlet {
                 for (int j = 0; j < methods.length; j++) {
                     if (methods[j].isAnnotationPresent(Annotation.class)) {
                         Mapping mapping = new Mapping(temp.getName(),methods[j].getName());
-                        this.mappingUrls.put(methods[j].getAnnotation(Annotation.class).url(),mapping);
+                        this.mappingUrls.put(methods[j].getAnnotation(Annotation.class).url(), mapping);
                     }
                 }
             }
@@ -39,9 +42,32 @@ public class FrontServlet extends HttpServlet {
     }
         public void processRequest(HttpServletRequest request, HttpServletResponse response)
                 throws ServletException, IOException {
-            try (PrintWriter out = response.getWriter()) {
-                out.println(" ok ");
+                PrintWriter out = response.getWriter();
+                try {
+                String url = request.getRequestURI().substring(request.getContextPath().length()+1);
+                out.println(this.mappingUrls);
+                if (this.mappingUrls.containsKey(url))
+                {
+                    Mapping mapping = this.mappingUrls.get(url);
+                    Class clazz = Class.forName(mapping.getClassName());
+                    Object object = clazz.getConstructor().newInstance();
+                    Method[] methods = object.getClass().getDeclaredMethods();
+                    Method equalMethod = null;
+                    for (int i = 0; i < methods.length; i++) {
+                        if (methods[i].getName().trim().compareTo(mapping.getMethod())==0) {
+                            equalMethod = methods[i];
+                            break;
+                        }
+                    }
+                    Object[] objects = new Object[1];
+                    Object returnObject = equalMethod.invoke(object);
+                    if (returnObject instanceof ModelView) {
+                        ModelView modelview = (ModelView) returnObject;
+                        RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
+                        requestDispatcher.forward(request, response);
+                    }
             }
+        }catch (Exception e) {e.printStackTrace(out);}
         }
 
         @Override

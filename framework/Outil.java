@@ -7,7 +7,6 @@ import java.util.List;
 public class Outil {
     public static List<Class> getClass(String packages)throws Exception{
         List<Class> listClass = new ArrayList<>();
-
         String path = packages.replaceAll("[.]", "\\\\");
         
         URL packageUrl = Thread.currentThread().getContextClassLoader().getResource(path);
@@ -18,6 +17,6 @@ public class Outil {
             String c = packages+"."+f.getName().substring(0,f.getName().lastIndexOf("."));
             lists.add(Class.forName(c));
         }
-        return listClass;
+        return lists;
     }
 }
