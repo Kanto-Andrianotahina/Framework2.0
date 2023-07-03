@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.net.URL;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -20,8 +20,7 @@ public class FrontServlet extends HttpServlet {
     HashMap<String,Mapping> mappingUrls;
 
     public void init() {
-        String packageName = "test";
-
+        String packageName = "Test";
         try {
             List<Class> allClass = Outil.getClass(packageName);
             for (int i = 0; i < allClass.size(); i++) {
@@ -35,7 +34,7 @@ public class FrontServlet extends HttpServlet {
                 }
             }
         } catch (Exception e) {
-            // TODO: handle exception
+           e.printStackTrace();
         }
     }
         public void processRequest(HttpServletRequest request, HttpServletResponse response)
