@@ -2,6 +2,7 @@ package test_framework.Test;
 import java.sql.Date;
 
 import etu1922.framework.Annotation;
+import etu1922.framework.FileUploader;
 import etu1922.framework.Parametre;
 import etu1922.framework.ModelView;
 
@@ -10,6 +11,7 @@ public class Emp {
     Date sqlDate;
     java.util.Date utilDate; 
     String[] table;
+    FileUploader file;
 
     public void setNom(String nom) {
         this.nom = nom;
@@ -35,6 +37,14 @@ public class Emp {
     public String[] getTable() {
         return table;
     }
+
+    public void setFile(FileUploader file) {
+        this.file = file;
+    }
+    public FileUploader getFile() {
+        return file;
+    }
+
 
     @Annotation(url="findAll")
     public void findAll(){
@@ -68,6 +78,15 @@ public class Emp {
         ModelView temp = new ModelView();
         temp.addItem("test",i);
         temp.setView("Teste.jsp");
+        return temp;
+    }
+
+    @Annotation(url="getFile")
+    public ModelView getFiles(){
+        ModelView temp = new ModelView();
+        temp.addItem("img",this.getFile().getNom());
+        temp.setView("Teste.jsp");
+        
         return temp;
     }
 }
