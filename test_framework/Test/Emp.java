@@ -2,6 +2,7 @@ package test_framework.Test;
 import java.sql.Date;
 
 import etu1922.framework.Annotation;
+import etu1922.framework.Parametre;
 import etu1922.framework.ModelView;
 
 public class Emp {
@@ -60,6 +61,13 @@ public class Emp {
             System.out.println(getTable()[i]);
         }
         
+        return temp;
+    }
+    @Annotation(url="getParam")
+    public ModelView getParam(@Parametre(param="param")Integer i){
+        ModelView temp = new ModelView();
+        temp.addItem("test",i);
+        temp.setView("Teste.jsp");
         return temp;
     }
 }
