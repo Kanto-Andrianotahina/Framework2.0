@@ -37,16 +37,21 @@ import etu1922.framework.Parametre;
 import etu1922.framework.Scope;
 import etu1922.framework.ModelView;
 import etu1922.framework.FileUploader;
+import etu1922.framework.Authentification;
 
 
 @MultipartConfig
 public class FrontServlet extends HttpServlet {
     HashMap<String,Mapping> mappingUrls = new HashMap<String,Mapping>();
     HashMap<String,Object> singleton = new HashMap<String,Object>();
+    String sessionN;
+    String sessionProfil;
 
     public void init() {
         String packageName = "test_framework.Test";
         try {
+            sessionN = getInitParameter("sessionN");
+            sessionProfil = getInitParameter("sessionProfil");
             List<Class> allClass = Outil.getClass(packageName);
             for (int i = 0; i < allClass.size(); i++) {
                 Class temp = allClass.get(i);
@@ -205,11 +210,23 @@ public class FrontServlet extends HttpServlet {
                             m.invoke(object, o);
                         }
                     }
-                } catch (Exception e) {
-                    
+                } catch (Exception e) { 
                 }
 
-                Object returnObject = equalMethod.invoke(object, params);
+                // Object returnObject = equalMethod.invoke(object, params);
+                Object returnObject = null;
+                    if (equalMethod.isAnnotationPresent(Authentification.class)) {
+                        Authentification auth = equalMethod.getAnnotation(Authentification.class);
+                        if (request.getSession().getAttribute(sessionN)!=null) {
+                            if ((auth.profil().isEmpty() == false && !auth.profil().equals(request.getSession().getAttribute(sessionProfil)))) {
+                                throw new Exception(" privilege non accorder ");
+                            }
+                        } else {
+                            throw new Exception("tsy misy session ");
+                        }
+                    }
+                returnObject = equalMethod.invoke(object, params);
+                
                 if (returnObject instanceof ModelView) {
                     ModelView modelview = (ModelView) returnObject;
                     HashMap<String,Object> data = modelview.getData();

@@ -6,6 +6,8 @@ import etu1922.framework.FileUploader;
 import etu1922.framework.Parametre;
 import etu1922.framework.Scope;
 import etu1922.framework.ModelView;
+import etu1922.framework.Authentification;
+
 
 
 @Scope(scope="Emp")
@@ -63,6 +65,7 @@ public class Emp {
 
         return temp;
     }
+    @Authentification(profil="admin")
     @Annotation(url="getVal")
     public ModelView getValueFromView(){
         ModelView temp = new ModelView();
@@ -92,4 +95,14 @@ public class Emp {
         
         return temp;
     }
+
+    @Annotation(url="login")
+    public ModelView login() {
+        ModelView temp = new ModelView();
+        temp.addSession("isConnected", true);
+        temp.addSession("profil","admin");
+        temp.setView("index.jsp");
+        return temp;
+    }
+
 }
