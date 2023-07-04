@@ -1,5 +1,6 @@
 package test_framework.Test;
 import java.sql.Date;
+import java.util.HashMap;
 
 import etu1922.framework.Annotation;
 import etu1922.framework.FileUploader;
@@ -7,6 +8,8 @@ import etu1922.framework.Parametre;
 import etu1922.framework.Scope;
 import etu1922.framework.ModelView;
 import etu1922.framework.Authentification;
+import etu1922.framework.Session;
+
 
 
 
@@ -17,6 +20,7 @@ public class Emp {
     java.util.Date utilDate; 
     String[] table;
     FileUploader file;
+    HashMap<String, Object> session;
 
     public void setNom(String nom) {
         this.nom = nom;
@@ -48,6 +52,12 @@ public class Emp {
     }
     public FileUploader getFile() {
         return file;
+    }
+    public void setSession(HashMap<String, Object> session) {
+        this.session = session;
+    }
+    public HashMap<String, Object> getSession() {
+        return session;
     }
 
 
@@ -101,6 +111,16 @@ public class Emp {
         ModelView temp = new ModelView();
         temp.addSession("isConnected", true);
         temp.addSession("profil","admin");
+        temp.setView("index.jsp");
+        return temp;
+    }
+
+    @Session
+    @Annotation(url="session")
+    public ModelView testSession() {
+        ModelView temp = new ModelView();
+        this.getSession().put("profil","test");
+        temp.addItem("session",this.getSession());
         temp.setView("index.jsp");
         return temp;
     }
