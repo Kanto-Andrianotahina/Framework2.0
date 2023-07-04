@@ -4,8 +4,11 @@ import java.sql.Date;
 import etu1922.framework.Annotation;
 import etu1922.framework.FileUploader;
 import etu1922.framework.Parametre;
+import etu1922.framework.Scope;
 import etu1922.framework.ModelView;
 
+
+@Scope(scope="Emp")
 public class Emp {
     String nom;
     Date sqlDate;
