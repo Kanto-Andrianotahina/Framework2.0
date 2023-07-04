@@ -2,6 +2,7 @@ package etu1922.framework.servlet;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -24,6 +25,7 @@ import java.io.PrintWriter;
 import etu1922.framework.Annotation;
 import etu1922.framework.Mapping;
 import etu1922.framework.Outil;
+import etu1922.framework.Parametre;
 import etu1922.framework.ModelView;
 
 
@@ -57,9 +59,11 @@ public class FrontServlet extends HttpServlet {
                 if (this.mappingUrls.containsKey(url))
                 {
                     Mapping mapping = this.mappingUrls.get(url);
+                    out.println(url);
                     Class clazz = Class.forName(mapping.getClassName());
                     Object object = clazz.getConstructor().newInstance();
                     Field[] input = clazz.getDeclaredFields();
+                    Method[] methods = clazz.getDeclaredMethods();
                     Enumeration<String> nom = request.getParameterNames();
                     List<String> list = Collections.list(nom);
                     for (int k = 0; k < input.length; k++) {    
@@ -90,17 +94,45 @@ public class FrontServlet extends HttpServlet {
                             }
                         }
                     }
-
-                    Method[] methods = object.getClass().getDeclaredMethods();
                     Method equalMethod = null;
+                    out.println(methods);
                     for (int i = 0; i < methods.length; i++) {
                         if (methods[i].getName().trim().compareTo(mapping.getMethod())==0) {
                             equalMethod = methods[i];
                             break;
                         }
                     }
-                    // Object[] objects = new Object[1];
-                    Object returnObject = equalMethod.invoke(object);
+                    out.print(equalMethod.getName() + "Methode");
+                    Parameter[] p = equalMethod.getParameters();
+                    Object[] params = new Object[p.length];
+                    for (int i = 0; i < p.length; i++) {
+                        if (p[i].isAnnotationPresent(Parametre.class)) {
+                            Parametre annotation = p[i].getAnnotation(Parametre.class);
+                            String temp = p[i].getAnnotation(Parametre.class).param() + ((p[i].getType().isArray()) ? "[]" : "");
+                            for (int j = 0; j < list.size(); j++) {
+                                if (temp.trim().equals(list.get(j).trim())) {
+                                    if (p[i].getType().isArray()==false) {
+                                        String object2 = request.getParameter(temp);
+                                        if (p[i].getType() == java.util.Date.class) {
+                                            SimpleDateFormat newF = new SimpleDateFormat("yyyy-MM-dd",Locale.ENGLISH);
+                                            Date newD = newF.parse(object2);
+                                            params[i] = newD;
+                                        }else if (p[i].getType() == java.sql.Date.class) {
+                                            java.sql.Date obj = java.sql.Date.valueOf(object2);
+                                            params[i] = obj;
+                                        }else {
+                                            Object obj = p[i].getType().getConstructor(String.class).newInstance(object2);
+                                            params[i] = obj;
+                                        }    
+                                    } else{
+                                        String[] resultToString = request.getParameterValues(temp);
+                                        params[i] = resultToString;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Object returnObject = equalMethod.invoke(object, params);
                     if (returnObject instanceof ModelView) {
                         ModelView modelview = (ModelView) returnObject;
                         HashMap<String,Object> data = modelview.getData();
@@ -110,6 +142,7 @@ public class FrontServlet extends HttpServlet {
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
                         requestDispatcher.forward(request, response);
                     }
+                    
             }
         }catch (Exception e) {e.printStackTrace(out);}
         }
