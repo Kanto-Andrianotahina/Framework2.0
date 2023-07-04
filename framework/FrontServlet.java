@@ -34,6 +34,7 @@ import etu1922.framework.Annotation;
 import etu1922.framework.Mapping;
 import etu1922.framework.Outil;
 import etu1922.framework.Parametre;
+import etu1922.framework.Scope;
 import etu1922.framework.ModelView;
 import etu1922.framework.FileUploader;
 
@@ -41,6 +42,8 @@ import etu1922.framework.FileUploader;
 @MultipartConfig
 public class FrontServlet extends HttpServlet {
     HashMap<String,Mapping> mappingUrls = new HashMap<String,Mapping>();
+    HashMap<String,Object> singleton = new HashMap<String,Object>();
+
     public void init() {
         String packageName = "test_framework.Test";
         try {
@@ -52,6 +55,11 @@ public class FrontServlet extends HttpServlet {
                     if (methods[j].isAnnotationPresent(Annotation.class)) {
                         Mapping mapping = new Mapping(temp.getName(),methods[j].getName());
                         this.mappingUrls.put(methods[j].getAnnotation(Annotation.class).url(), mapping);
+                    }
+                }
+                for (int k = 0; k < allClass.size(); k++) {
+                    if (allClass.get(k).isAnnotationPresent(Scope.class)) {
+                        this.singleton.put(allClass.get(k).getName(), null);
                     }
                 }
             }
