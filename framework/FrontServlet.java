@@ -38,6 +38,7 @@ import etu1922.framework.Scope;
 import etu1922.framework.ModelView;
 import etu1922.framework.FileUploader;
 import etu1922.framework.Authentification;
+import etu1922.framework.Session;
 
 
 @MultipartConfig
@@ -225,13 +226,36 @@ public class FrontServlet extends HttpServlet {
                             throw new Exception("tsy misy session ");
                         }
                     }
+                    if (equalMethod.isAnnotationPresent(Session.class)) {
+                        Method method = clazz.getDeclaredMethod("setSession", HashMap.class);
+                        HashMap<String, Object> ses = new HashMap<String, Object>();
+                        Enumeration<String> noms = request.getSession().getAttributeNames();
+                        List<String> listeStrings = Collections.list(noms);
+                        for (String string : listeStrings) {
+                            Object temp = request.getSession().getAttribute(string);
+                            ses.put(string, temp);
+                        }
+                        method.invoke(object, ses);
+                    }
                 returnObject = equalMethod.invoke(object, params);
+                    if (equalMethod.isAnnotationPresent(Session.class)) {
+                        Method method = clazz.getDeclaredMethod("getSession");
+                        HashMap<String, Object> ses = new HashMap<String, Object>();
+                        ses = (HashMap<String, Object>)method.invoke(object);
+                        for (Map.Entry<String, Object> o : ses.entrySet()) {
+                            request.getSession().setAttribute(o.getKey(), o.getValue());
+                        }
+                    }
                 
                 if (returnObject instanceof ModelView) {
                     ModelView modelview = (ModelView) returnObject;
                     HashMap<String,Object> data = modelview.getData();
+                    HashMap<String, Object> session = modelview.getSession();
                     for(Map.Entry<String,Object> o : data.entrySet()){
                         request.setAttribute(o.getKey(),o.getValue());
+                    }
+                    for (Map.Entry<String, Object> o : session.entrySet()) {
+                        request.getSession().setAttribute(o.getKey(), o.getValue());
                     }  
                     RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
                     requestDispatcher.forward(request, response);
