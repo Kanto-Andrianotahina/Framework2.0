@@ -126,7 +126,7 @@ public class Emp {
         return temp;
     }
 
-    @RestAPI()
+    @RestAPI
     @Annotation(url="listEmp")
     public Emp listEmp(){
         Emp temp =new Emp();

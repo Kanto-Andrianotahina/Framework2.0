@@ -258,10 +258,16 @@ public class FrontServlet extends HttpServlet {
                     for (Map.Entry<String, Object> o : session.entrySet()) {
                         request.getSession().setAttribute(o.getKey(), o.getValue());
                     }
-                    if (modelview.isJson == true) {
+                    if (modelview.getIsJson() == true) {
                         response.setContentType("application/json");
-                        out.println(new com.google.gson.Gson().to);
+                        out.println(new com.google.gson.Gson().toJson(data));
                     } else {
+                        if (modelview.getInvalidSession() == true) {
+                            request.getSession().invalidate();
+                        }
+                        for (String temp : modelview.getRemoveSession() ) {
+                            request.getSession().removeAttribute(temp);
+                        }
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
                         requestDispatcher.forward(request, response);
                     }  
