@@ -9,6 +9,7 @@ import etu1922.framework.Scope;
 import etu1922.framework.ModelView;
 import etu1922.framework.Authentification;
 import etu1922.framework.Session;
+import etu1922.framework.RestAPI;
 
 
 
@@ -122,6 +123,14 @@ public class Emp {
         this.getSession().put("profil","test");
         temp.addItem("session",this.getSession());
         temp.setView("index.jsp");
+        return temp;
+    }
+
+    @RestAPI()
+    @Annotation(url="listEmp")
+    public Emp listEmp(){
+        Emp temp =new Emp();
+        temp.setNom("Kanto");
         return temp;
     }
 
