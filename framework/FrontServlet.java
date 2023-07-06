@@ -34,6 +34,7 @@ import etu1922.framework.Annotation;
 import etu1922.framework.Mapping;
 import etu1922.framework.Outil;
 import etu1922.framework.Parametre;
+import etu1922.framework.RestAPI;
 import etu1922.framework.Scope;
 import etu1922.framework.ModelView;
 import etu1922.framework.FileUploader;
@@ -264,6 +265,10 @@ public class FrontServlet extends HttpServlet {
                         RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
                         requestDispatcher.forward(request, response);
                     }  
+                } 
+                else if (equalMethod.isAnnotationPresent(RestAPI.class)) {
+                    response.setContentType("application/json");
+                    out.println(new com.google.gson.Gson().toJson(returnObject));
                 }
 
             }
