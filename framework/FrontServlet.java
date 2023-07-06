@@ -256,10 +256,16 @@ public class FrontServlet extends HttpServlet {
                     }
                     for (Map.Entry<String, Object> o : session.entrySet()) {
                         request.getSession().setAttribute(o.getKey(), o.getValue());
+                    }
+                    if (modelview.isJson == true) {
+                        response.setContentType("application/json");
+                        out.println(new com.google.gson.Gson().to);
+                    } else {
+                        RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
+                        requestDispatcher.forward(request, response);
                     }  
-                    RequestDispatcher requestDispatcher = request.getRequestDispatcher(modelview.getView());
-                    requestDispatcher.forward(request, response);
-                }   
+                }
+
             }
         }catch (Exception e) {e.printStackTrace(out);}
         }
